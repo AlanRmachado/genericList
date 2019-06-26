@@ -1,4 +1,4 @@
-# genericList
+# GenericTable
 Componente para renderizar uma lista genéria, baseado em um JSON. Foi feito para uso pessoal em determinado projeto, porém, 
 pode servir como idéia ou até mesmo para algum outro caso de uso.
 
