@@ -1,0 +1,17 @@
+.body-card-dash::-webkit-scrollbar-track {
+  background-color: #eee !important;
+}
+
+.body-card-dash::-webkit-scrollbar {
+  width: 0px !important;
+  background: #eee !important;
+}
+
+.body-card-dash:-webkit-scrollbar-thumb {
+  background: #eee !important;
+  -webkit-overflow-scrolling: touch;
+}
+.rollX{
+  overflow-x: auto;
+  overflow-y: hidden
+}

@@ -7,16 +7,16 @@ export const columnGenericTable = props => { }
 export default class GenericTable extends Component {
 
   static defaultProps = {
-    columns: [],
-    options: []
+    options: [],
+    overfllowXBody : false,
+    withoutHeight : true
   }
 
-  state = {
-    activeEfeito: false,
+  state = {   
     qtPages: 1,
     pageAtual: 1,
     tds: [],
-    activeEfeito: false,
+    activeAnimation: false,
     mesAberto: true,
     th: null,
 
@@ -27,7 +27,7 @@ export default class GenericTable extends Component {
     this.setState({ qtPages: size }, () => this.montaTable());
   }
 
-  componentDidUpdate(oldProps) {
+  componentDidUpdate(oldProps){
     let size = 0;
 
     if (this.props.options !== oldProps.options) {
@@ -40,8 +40,8 @@ export default class GenericTable extends Component {
     }
   }
 
-  
-  enumeraArray = (array)=> {
+
+  putOrderOnArray = (array)=> {
     let pageItem = 1;
     array.map((o, index) => {
         let numeroItem = index + 1;
@@ -50,24 +50,25 @@ export default class GenericTable extends Component {
             if (aux > pageItem) pageItem++
         }
         o.page = pageItem;
+        return o;
     });
 
     return array;
 }
 
-  voltaTablePontos = () => {
-    this.setState({ activeEfeito: true })
+  nextPage = () => {
+    this.setState({ activeAnimation: true })
     setTimeout(() => {
-      this.setState({ activeEfeito: false });
+      this.setState({ activeAnimation: false });
     }, 500)
     this.montaTable(this.state.pageAtual - 1);
   }
 
 
-  avancaTablePontos = () => {
-    this.setState({ activeEfeito: true })
+  backPage = () => {
+    this.setState({ activeAnimation: true })
     setTimeout(() => {
-      this.setState({ activeEfeito: false });
+      this.setState({ activeAnimation: false });
     }, 500)
     this.montaTable(this.state.pageAtual + 1);
   }
@@ -85,9 +86,10 @@ export default class GenericTable extends Component {
       return;
     }
 
+
     let dataFields = [];
     let th = [];
-
+    
     /**
      * Esse talvez seja o método mais complexo. Primeiramente, verica-se  esse props children é um array ou não. O 
      * motivo dessa validacao, se da ao fato de que, quando um componente react tem apenas 1 filho, ele nos tras um 
@@ -117,8 +119,7 @@ export default class GenericTable extends Component {
     for(let i = 0; i > childrens.length; i ++){
       const o = childrens[i];
       if(o.type !== "columnGenericTable"){
-        throw new Error("O componente filho do componente GenericTable deve ser um columnGenericTable");
-        return;
+        throw new Error("O componente filho do componente GenericTable deve ser um columnGenericTable");        
       }
     }    
    
@@ -137,7 +138,7 @@ export default class GenericTable extends Component {
     }
 
     const newArr = this.props.options.map(o => o);
-    const arrToMap = this.enumeraArray(newArr).filter(o => o.page === page);
+    const arrToMap = this.putOrderOnArray(newArr).filter(o => o.page === page);
     
     let trs = [];
     for (let j = 0; j < arrToMap.length; j++) {
@@ -161,11 +162,11 @@ export default class GenericTable extends Component {
           <div className={`header-container-dash ${this.props.headerClass}`}>
             <h6>{this.props.title}</h6>
             <div className="tableFooterPonto">
-              <Icon name="chevron circle left" disabled={this.state.pageAtual === 1} size="big" id="controlDireitoDash" className="arrowIconList marginLeft" onClick={this.voltaTablePontos} />
-              <Icon name="chevron circle right" disabled={(this.state.pageAtual === this.state.qtPages)} size="big" id="controlEsquerdoDash" className="arrowIconList" onClick={this.avancaTablePontos} />
+              <Icon name="chevron circle left" disabled={this.state.pageAtual === 1} size="big" id="controlDireitoDash" className="arrowIconList marginLeft" onClick={this.backPage} />
+              <Icon name="chevron circle right" disabled={(this.state.pageAtual === this.state.qtPages)} size="big" id="controlEsquerdoDash" className="arrowIconList" onClick={this.nextPage} />
             </div>
           </div>
-          <div className="body-card-dash">
+          <div className={` body-card-dash ${this.props.overfllowXBody ? "rollX" : ""} ${this.props.withoutHeight ? "withoutHeight" : ""}`}>
             <div className="body-to-table-dash">
               <table className="table-dash verbas">
                 <thead>
@@ -173,7 +174,7 @@ export default class GenericTable extends Component {
                     {this.state.th}
                   </tr>
                 </thead>
-                <tbody className={`${this.state.activeEfeito ? "efectLines" : ""}`}>
+                <tbody className={`${this.state.activeAnimation ? "efectLines" : ""}`}>
                   {this.state.tds}
                 </tbody>
               </table>
