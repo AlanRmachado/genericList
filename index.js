@@ -8,11 +8,11 @@ export default class GenericTable extends Component {
 
   static defaultProps = {
     options: [],
-    overfllowXBody : false,
-    withoutHeight : true
+    overfllowXBody: false,
+    withoutHeight: true
   }
 
-  state = {   
+  state = {
     qtPages: 1,
     pageAtual: 1,
     tds: [],
@@ -27,7 +27,7 @@ export default class GenericTable extends Component {
     this.setState({ qtPages: size }, () => this.montaTable());
   }
 
-  componentDidUpdate(oldProps){
+  componentDidUpdate(oldProps) {
     let size = 0;
 
     if (this.props.options !== oldProps.options) {
@@ -41,20 +41,20 @@ export default class GenericTable extends Component {
   }
 
 
-  putOrderOnArray = (array)=> {
+  putOrderOnArray = (array) => {
     let pageItem = 1;
     array.map((o, index) => {
-        let numeroItem = index + 1;
-        if (numeroItem) {
-            let aux = Math.ceil(numeroItem / 7);
-            if (aux > pageItem) pageItem++
-        }
-        o.page = pageItem;
-        return o;
+      let numeroItem = index + 1;
+      if (numeroItem) {
+        let aux = Math.ceil(numeroItem / 7);
+        if (aux > pageItem) pageItem++
+      }
+      o.page = pageItem;
+      return o;
     });
 
     return array;
-}
+  }
 
   nextPage = () => {
     this.setState({ activeAnimation: true })
@@ -89,7 +89,7 @@ export default class GenericTable extends Component {
 
     let dataFields = [];
     let th = [];
-    
+
     /**
      * Esse talvez seja o método mais complexo. Primeiramente, verica-se  esse props children é um array ou não. O 
      * motivo dessa validacao, se da ao fato de que, quando um componente react tem apenas 1 filho, ele nos tras um 
@@ -105,45 +105,45 @@ export default class GenericTable extends Component {
      *  
      **/
 
-    if(!this.props.children) {
-      throw new Error('Nenhuma coluna definida'); 
+    if (!this.props.children) {
+      throw new Error('Nenhuma coluna definida');
     };
 
     const childrens = this.props.children;
-    if(childrens.constructor !== Array){
-       if(childrens.type !== "columnGenericTable"){
+    if (childrens.constructor !== Array) {
+      if (childrens.type !== "columnGenericTable") {
         throw new Error("O componente filho do componente GenericTable deve ser um columnGenericTable");
-       }
+      }
     }
 
-    for(let i = 0; i > childrens.length; i ++){
+    for (let i = 0; i > childrens.length; i++) {
       const o = childrens[i];
-      if(o.type !== "columnGenericTable"){
-        throw new Error("O componente filho do componente GenericTable deve ser um columnGenericTable");        
+      if (o.type !== "columnGenericTable") {
+        throw new Error("O componente filho do componente GenericTable deve ser um columnGenericTable");
       }
-    }    
-   
+    }
+
 
     if (this.props.children.constructor === Array) {
       th = this.props.children.map((column, index) => {
         const dataField = column.props.dataField;
         const tdClassName = column.props.tdClassName || "";
         const trClassName = column.props.trClassName || "";
-        dataFields.push({dataField : dataField, tdClassName:tdClassName});
+        dataFields.push({ dataField: dataField, tdClassName: tdClassName });
         return <th className={`${trClassName}`} key={index}>{column.props.children}</th>
       });
     } else {
-      th = <th className={`${this.props.trClassName}`}>{this.props.children}</th>      
-      dataFields.push({ dataField : this.props.children.props.dataField, tdClassName : this.props.children.props.className});
+      th = <th className={`${this.props.trClassName}`}>{this.props.children}</th>
+      dataFields.push({ dataField: this.props.children.props.dataField, tdClassName: this.props.children.props.className });
     }
 
     const newArr = this.props.options.map(o => o);
     const arrToMap = this.putOrderOnArray(newArr).filter(o => o.page === page);
-    
+
     let trs = [];
     for (let j = 0; j < arrToMap.length; j++) {
       let auxTd = [];
-      
+
       for (let i = 0; i < dataFields.length; i++) {
         auxTd.push(<td className={`${dataFields[i]['tdClassName']}`} key={i}><p>{arrToMap[j][dataFields[i]['dataField']]}</p></td>)
       }
@@ -158,27 +158,27 @@ export default class GenericTable extends Component {
   render() {
     return (
       <>
-        <div className={`container-card-dash ${this.props.containerClass}`}>
-          <div className={`header-container-dash ${this.props.headerClass}`}>
+        <div className={`container-generic-table ${this.props.containerClass}`}>
+          <div className={`header-container-generic-table ${this.props.headerClass}`}>
             <h6>{this.props.title}</h6>
-            <div className="tableFooterPonto">
+            <div className="">
               <Icon name="chevron circle left" disabled={this.state.pageAtual === 1} size="big" id="controlDireitoDash" className="arrowIconList marginLeft" onClick={this.backPage} />
               <Icon name="chevron circle right" disabled={(this.state.pageAtual === this.state.qtPages)} size="big" id="controlEsquerdoDash" className="arrowIconList" onClick={this.nextPage} />
             </div>
           </div>
-          <div className={` body-card-dash ${this.props.overfllowXBody ? "rollX" : ""} ${this.props.withoutHeight ? "withoutHeight" : ""}`}>
-            <div className="body-to-table-dash">
-              <table className="table-dash verbas">
-                <thead>
-                  <tr>
-                    {this.state.th}
-                  </tr>
-                </thead>
-                <tbody className={`${this.state.activeAnimation ? "efectLines" : ""}`}>
-                  {this.state.tds}
-                </tbody>
-              </table>
-            </div>
+          <div className={` body-generic-table  ${this.props.overfllowXBody ? "rollX" : ""} ${this.props.withoutHeight ? "withoutHeight" : ""}`}>
+
+            <table className="table-generic-table">
+              <thead>
+                <tr>
+                  {this.state.th}
+                </tr>
+              </thead>
+              <tbody className={`${this.state.activeAnimation ? "changePageAnimation" : ""}`}>
+                {this.state.tds}
+              </tbody>
+            </table>
+
           </div>
         </div>
       </>
